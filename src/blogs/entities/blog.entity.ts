@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 import { BlogStatus } from '../enum/blog.enum';
 import { User } from 'src/users/entities/user.entity';
@@ -46,4 +47,7 @@ export class Blog {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date | null;
 }
