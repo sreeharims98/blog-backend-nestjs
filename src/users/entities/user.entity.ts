@@ -2,10 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Role } from '../enums/role.enum';
+import { Blog } from 'src/blogs/entities/blog.entity';
 
 @Entity('users')
 export class User {
@@ -31,6 +33,9 @@ export class User {
     default: Role.USER,
   })
   role: Role;
+
+  @OneToMany(() => Blog, (blog) => blog.author)
+  blogs: Blog[];
 
   @CreateDateColumn()
   createdAt: Date;
