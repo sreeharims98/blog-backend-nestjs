@@ -6,9 +6,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { BlogsModule } from './blogs/blogs.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // time window in milliseconds (60s)
+        limit: 20, // max requests per window, per IP
+      },
+    ]),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -27,7 +35,7 @@ import { BlogsModule } from './blogs/blogs.module';
 
         autoLoadEntities: true,
 
-        synchronize: true,
+        synchronize: false,
       }),
     }),
     AuthModule,
@@ -35,6 +43,12 @@ import { BlogsModule } from './blogs/blogs.module';
     BlogsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard, // applies to every route by default
+    },
+  ],
 })
 export class AppModule {}

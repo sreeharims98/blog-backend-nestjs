@@ -15,6 +15,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from './enums/role.enum';
 import { QueryUserDto } from './dto/query-user.dto';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller('users')
 export class UsersController {
@@ -40,6 +41,7 @@ export class UsersController {
   @Get('admin/all')
   @Auth()
   @Roles(Role.ADMIN)
+  @SkipThrottle()
   adminFindAllUsers(@Query() query: QueryUserDto) {
     return this.usersService.adminFindAllUsers(query);
   }
