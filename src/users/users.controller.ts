@@ -20,21 +20,6 @@ import { QueryUserDto } from './dto/query-user.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // ADMIN
-  @Get('admin/all')
-  @Auth()
-  @Roles(Role.ADMIN)
-  findAllUsers(@Query() query: QueryUserDto) {
-    return this.usersService.findAllUsers(query);
-  }
-
-  @Patch('admin/deactivate/:id')
-  @Auth()
-  @Roles(Role.ADMIN)
-  deactivateUser(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.deactivateUser(id);
-  }
-
   // USERS
   @Get('me')
   @Auth()
@@ -42,12 +27,27 @@ export class UsersController {
     return user;
   }
 
-  @Patch('me/update')
+  @Patch('me')
   @Auth()
   updateMyProfile(
     @Body() updateUserDto: UpdateUserDto,
     @CurrentUser() user: User,
   ) {
     return this.usersService.updateMyProfile(updateUserDto, user);
+  }
+
+  // ADMIN
+  @Get('admin/all')
+  @Auth()
+  @Roles(Role.ADMIN)
+  adminFindAllUsers(@Query() query: QueryUserDto) {
+    return this.usersService.adminFindAllUsers(query);
+  }
+
+  @Patch('admin/deactivate/:id')
+  @Auth()
+  @Roles(Role.ADMIN)
+  adminDeactivateUser(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.adminDeactivateUser(id);
   }
 }

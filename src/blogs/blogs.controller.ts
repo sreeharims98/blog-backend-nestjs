@@ -18,13 +18,15 @@ import { ApiResponse } from '@nestjs/swagger';
 import { BlogResponseDto } from './dto/blog-response.dto';
 import { QueryBlogDto } from './dto/query-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/users/enums/role.enum';
 
-@Auth()
 @Controller('blogs')
 export class BlogsController {
   constructor(private readonly blogsService: BlogsService) {}
 
   @Post()
+  @Auth()
   @ApiResponse({ status: 201, type: BlogResponseDto })
   create(@Body() dto: CreateBlogDto, @CurrentUser() user: User) {
     return this.blogsService.create(dto, user);
@@ -36,6 +38,7 @@ export class BlogsController {
   }
 
   @Patch(':id')
+  @Auth()
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateBlogDto,
@@ -45,7 +48,15 @@ export class BlogsController {
   }
 
   @Delete(':id')
+  @Auth()
   remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: User) {
     return this.blogsService.remove(id, user);
+  }
+
+  @Delete('admin/:id')
+  @Auth()
+  @Roles(Role.ADMIN)
+  adminRemoveBlog(@Param('id') id: number) {
+    return this.blogsService.adminRemoveBlog(id);
   }
 }

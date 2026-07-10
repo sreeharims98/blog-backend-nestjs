@@ -22,6 +22,15 @@ export class BlogsService {
     private readonly slugService: SlugService,
   ) {}
 
+  async findBlogById(id: number) {
+    return await this.blogRepository.findOne({
+      where: { id },
+      relations: {
+        author: true,
+      },
+    });
+  }
+
   async create(dto: CreateBlogDto, author: User): Promise<BlogResponseDto> {
     const slug = await this.slugService.generateUniqueSlug(
       dto.title,
@@ -89,12 +98,7 @@ export class BlogsService {
   }
 
   async update(id: number, dto: UpdateBlogDto, user: User) {
-    const blog = await this.blogRepository.findOne({
-      where: { id },
-      relations: {
-        author: true,
-      },
-    });
+    const blog = await this.findBlogById(id);
     if (!blog) {
       throw new NotFoundException('Blog not found');
     }
@@ -118,17 +122,23 @@ export class BlogsService {
   }
 
   async remove(id: number, user: User) {
-    const blog = await this.blogRepository.findOne({
-      where: { id },
-      relations: {
-        author: true,
-      },
-    });
+    const blog = await this.findBlogById(id);
     if (!blog) {
       throw new NotFoundException('Blog not found');
     }
     if (blog.author.id !== user.id) {
       throw new ForbiddenException('You cannot edit this blog');
+    }
+
+    await this.blogRepository.softDelete(id);
+    return { message: 'Blog deleted successfully' };
+  }
+
+  async adminRemoveBlog(id: number) {
+    const blog = await this.findBlogById(id);
+
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
     }
 
     await this.blogRepository.softDelete(id);

@@ -53,7 +53,7 @@ export class UsersService {
     return await this.usersRepository.save(user);
   }
 
-  async findAllUsers(query: QueryUserDto) {
+  async adminFindAllUsers(query: QueryUserDto) {
     const qb = this.usersRepository
       .createQueryBuilder('user')
       .select(['user.id', 'user.name', 'user.email']);
@@ -82,7 +82,7 @@ export class UsersService {
     return new PaginatedResponseDto(users, query.page, query.limit, total);
   }
 
-  async deactivateUser(id: number) {
+  async adminDeactivateUser(id: number) {
     const existingUser = await this.findById(id);
     if (!existingUser) {
       throw new NotFoundException('User not found!');
