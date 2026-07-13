@@ -8,6 +8,8 @@ import { UsersService } from 'src/users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { PasswordService } from 'src/common/services/password-service';
+import { RefreshTokensService } from 'src/refresh_tokens/refresh_tokens.service';
+import { TokenService } from 'src/common/services/token-service';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +17,8 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly passwordService: PasswordService,
+    private readonly tokenService: TokenService,
+    private readonly refreshTokenService: RefreshTokensService,
   ) {}
 
   async login(loginDto: LoginDto) {
@@ -38,9 +42,17 @@ export class AuthService {
       email: user.email,
     };
 
-    const accessToken = await this.jwtService.signAsync(payload);
+    const accessToken = await this.jwtService.signAsync(payload, {
+      expiresIn: '15m',
+    });
 
-    return { accessToken };
+    const refreshToken = this.tokenService.createRefreshToken();
+
+    const hashedRefresh = this.tokenService.hashToken(refreshToken);
+
+    await this.refreshTokenService.create(user, hashedRefresh);
+
+    return { accessToken, refreshToken };
   }
 
   async register(registerDto: RegisterDto) {
@@ -61,5 +73,43 @@ export class AuthService {
     return {
       message: 'User registered successfully',
     };
+  }
+
+  async refreshToken(rawRefreshToken: string) {
+    // Look up the token by its hash — raw tokens are never stored
+    const hashedRefresh = this.tokenService.hashToken(rawRefreshToken);
+    const stored = await this.refreshTokenService.findRefresh(hashedRefresh);
+
+    if (!stored) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+    if (stored.revokedAt) {
+      throw new UnauthorizedException('Refresh token has been revoked');
+    }
+    if (stored.expiresAt < new Date()) {
+      throw new UnauthorizedException('Refresh token has expired');
+    }
+    if (!stored.user.isActive) {
+      throw new UnauthorizedException('Account is deactivated');
+    }
+
+    // Rotate: revoke old token
+    await this.refreshTokenService.revokeRefresh(stored);
+
+    // Issue a new refresh token
+    const newRawRefreshToken = this.tokenService.createRefreshToken();
+    const newHashedRefresh = this.tokenService.hashToken(newRawRefreshToken);
+    await this.refreshTokenService.create(stored.user, newHashedRefresh);
+
+    // Issue a new access token
+    const payload = {
+      sub: stored.user.id,
+      email: stored.user.email,
+    };
+    const accessToken = await this.jwtService.signAsync(payload, {
+      expiresIn: '15m',
+    });
+
+    return { accessToken, refreshToken: newRawRefreshToken };
   }
 }

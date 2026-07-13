@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { BlogsModule } from './blogs/blogs.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { RefreshTokensModule } from './refresh_tokens/refresh_tokens.module';
 
 @Module({
   imports: [
@@ -35,12 +36,13 @@ import { APP_GUARD } from '@nestjs/core';
 
         autoLoadEntities: true,
 
-        synchronize: false,
+        synchronize: true,
       }),
     }),
     AuthModule,
     UsersModule,
     BlogsModule,
+    RefreshTokensModule,
   ],
   controllers: [AppController],
   providers: [
