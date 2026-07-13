@@ -13,12 +13,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from './enums/role.enum';
 import { QueryUserDto } from './dto/query-user.dto';
 import { PaginatedResponseDto } from 'src/common/dto/paginated-response.dto';
+import { RefreshTokensService } from 'src/refresh_tokens/refresh_tokens.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    private readonly refreshTokensService: RefreshTokensService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -95,6 +97,10 @@ export class UsersService {
     }
     existingUser.isActive = false;
     await this.usersRepository.save(existingUser);
+
+    // revoke all user tokens after deactivate
+    await this.refreshTokensService.revokeAllUserTokens(existingUser.id);
+
     return {
       message: 'User deactivated successfully',
     };

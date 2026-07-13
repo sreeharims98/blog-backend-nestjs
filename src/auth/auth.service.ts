@@ -10,6 +10,7 @@ import { RegisterDto } from './dto/register.dto';
 import { PasswordService } from 'src/common/services/password-service';
 import { RefreshTokensService } from 'src/refresh_tokens/refresh_tokens.service';
 import { TokenService } from 'src/common/services/token-service';
+import { RefreshTokenDto } from 'src/refresh_tokens/dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -111,5 +112,10 @@ export class AuthService {
     });
 
     return { accessToken, refreshToken: newRawRefreshToken };
+  }
+
+  async logout(dto: RefreshTokenDto) {
+    await this.refreshTokenService.revokeRefreshToken(dto.refreshToken);
+    return { message: 'Logged out successfully' };
   }
 }
