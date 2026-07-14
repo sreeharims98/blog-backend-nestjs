@@ -19,4 +19,3 @@ const options: DataSourceOptions & SeederOptions = {
 };
 
 export default new DataSource(options);
-
