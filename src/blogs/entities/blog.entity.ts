@@ -10,7 +10,7 @@ import {
   Index,
 } from 'typeorm';
 import { BlogStatus } from '../enum/blog.enum';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('blogs')
 // Compound Partial Index for status and createdAt

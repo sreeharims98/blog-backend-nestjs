@@ -36,7 +36,9 @@ import { RefreshTokensModule } from './refresh_tokens/refresh_tokens.module';
 
         autoLoadEntities: true,
 
-        synchronize: true,
+        synchronize: false,
+        migrations: ['dist/migrations/*.js'], // compiled JS path for runtime
+        migrationsRun: true, // auto-run pending migrations on startup — optional
       }),
     }),
     AuthModule,
