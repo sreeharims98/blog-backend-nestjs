@@ -1,6 +1,6 @@
 import { setSeederFactory } from 'typeorm-extension';
-import { Blog } from '../blogs/entities/blog.entity';
-import { BlogStatus } from '../blogs/enum/blog.enum';
+import { Blog } from '../../src/blogs/entities/blog.entity';
+import { BlogStatus } from '../../src/blogs/enum/blog.enum';
 import slugify from 'slugify';
 
 export const BlogFactory = setSeederFactory(Blog, (faker) => {

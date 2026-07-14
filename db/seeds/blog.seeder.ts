@@ -1,7 +1,7 @@
 import { Seeder, SeederFactoryManager } from 'typeorm-extension';
 import { DataSource } from 'typeorm';
-import { Blog } from '../blogs/entities/blog.entity';
-import { User } from '../users/entities/user.entity';
+import { Blog } from '../../src/blogs/entities/blog.entity';
+import { User } from '../../src/users/entities/user.entity';
 
 export default class BlogSeeder implements Seeder {
   public async run(

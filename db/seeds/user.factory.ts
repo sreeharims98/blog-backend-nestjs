@@ -1,6 +1,6 @@
 import { setSeederFactory } from 'typeorm-extension';
-import { User } from '../users/entities/user.entity';
-import { Role } from '../users/enums/role.enum';
+import { User } from '../../src/users/entities/user.entity';
+import { Role } from '../../src/users/enums/role.enum';
 import * as bcrypt from 'bcrypt';
 
 // Pre-hash password for performance in bulk seeding

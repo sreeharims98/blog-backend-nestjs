@@ -9,6 +9,7 @@ import { BlogsModule } from './blogs/blogs.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { RefreshTokensModule } from './refresh_tokens/refresh_tokens.module';
+import { VerificationTokenModule } from './verification_token/verification_token.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { RefreshTokensModule } from './refresh_tokens/refresh_tokens.module';
     UsersModule,
     BlogsModule,
     RefreshTokensModule,
+    VerificationTokenModule,
   ],
   controllers: [AppController],
   providers: [

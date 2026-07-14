@@ -12,7 +12,7 @@ const options: DataSourceOptions & SeederOptions = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   entities: ['src/**/*.entity.ts'],
-  migrations: ['src/migrations/*.ts'],
+  migrations: ['db/migrations/*.ts'],
   synchronize: false,
   seeds: [(__dirname + '/seeds/main.seeder{.ts,.js}').replace(/\\/g, '/')],
   factories: [(__dirname + '/seeds/**/*.factory{.ts,.js}').replace(/\\/g, '/')],

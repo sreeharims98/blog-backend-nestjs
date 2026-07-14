@@ -4,7 +4,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { RefreshToken } from './entities/refresh_token.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TokenService } from 'src/common/services/token-service';
+import { TokenService } from 'src/common/services/token.service';
 
 @Injectable()
 export class RefreshTokensService {

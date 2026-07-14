@@ -7,10 +7,11 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { PasswordService } from 'src/common/services/password-service';
+import { PasswordService } from 'src/common/services/password.service';
 import { RefreshTokensService } from 'src/refresh_tokens/refresh_tokens.service';
-import { TokenService } from 'src/common/services/token-service';
+import { TokenService } from 'src/common/services/token.service';
 import { RefreshTokenDto } from 'src/refresh_tokens/dto/refresh-token.dto';
+import { VerificationTokenService } from 'src/verification_token/verification_token.service';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,7 @@ export class AuthService {
     private readonly passwordService: PasswordService,
     private readonly tokenService: TokenService,
     private readonly refreshTokenService: RefreshTokensService,
+    private readonly verificationTokenService: VerificationTokenService,
   ) {}
 
   async login(loginDto: LoginDto) {
@@ -66,13 +68,17 @@ export class AuthService {
       registerDto.password,
     );
 
-    await this.usersService.create({
+    const user = await this.usersService.create({
       ...registerDto,
       password: hashedPassword,
     });
 
+    // Send verification email — don't block registration on it
+    await this.verificationTokenService.sendVerificationEmail(user);
+
     return {
-      message: 'User registered successfully',
+      message:
+        'Registration successful. Please check your email to verify your account.',
     };
   }
 

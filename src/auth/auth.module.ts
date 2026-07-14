@@ -6,14 +6,16 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { StringValue } from 'ms';
 import { JwtStrategy } from './strategies/jwt.strategy/jwt.strategy';
-import { PasswordService } from 'src/common/services/password-service';
+import { PasswordService } from 'src/common/services/password.service';
 import { RefreshTokensModule } from 'src/refresh_tokens/refresh_tokens.module';
-import { TokenService } from 'src/common/services/token-service';
+import { TokenService } from 'src/common/services/token.service';
+import { VerificationTokenModule } from 'src/verification_token/verification_token.module';
 
 @Module({
   imports: [
     UsersModule,
     RefreshTokensModule,
+    VerificationTokenModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
