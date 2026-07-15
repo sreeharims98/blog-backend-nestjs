@@ -10,6 +10,10 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { RefreshTokensModule } from './refresh_tokens/refresh_tokens.module';
 import { VerificationTokenModule } from './verification_token/verification_token.module';
+import databaseConfig from './config/database.config';
+import jwtConfig from './config/jwt.config';
+import mailConfig from './config/mail.config';
+import { validate } from './config/env.validation';
 
 @Module({
   imports: [
@@ -21,19 +25,21 @@ import { VerificationTokenModule } from './verification_token/verification_token
     ]),
     ConfigModule.forRoot({
       isGlobal: true,
+      validate,
+      load: [databaseConfig, jwtConfig, mailConfig],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
 
-        host: config.get<string>('DB_HOST'),
-        port: config.get<number>('DB_PORT'),
+        host: config.get<string>('database.host'),
+        port: config.get<number>('database.port'),
 
-        username: config.get<string>('DB_USERNAME'),
-        password: config.get<string>('DB_PASSWORD'),
+        username: config.get<string>('database.username'),
+        password: config.get<string>('database.password'),
 
-        database: config.get<string>('DB_NAME'),
+        database: config.get<string>('database.database'),
 
         autoLoadEntities: true,
 

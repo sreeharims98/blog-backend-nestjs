@@ -15,19 +15,19 @@ export class MailService {
   constructor(private readonly config: ConfigService) {
     // https://resend.com/settings/smtp
     this.transporter = nodemailer.createTransport({
-      host: this.config.get<string>('SMTP_HOST'),
-      port: this.config.get<number>('SMTP_PORT'),
+      host: this.config.get<string>('mail.host'),
+      port: this.config.get<number>('mail.port'),
       secure: true,
       auth: {
-        user: this.config.get<string>('SMTP_USER'),
-        pass: this.config.get<string>('SMTP_PASS'),
+        user: this.config.get<string>('mail.user'),
+        pass: this.config.get<string>('mail.pass'),
       },
     });
   }
 
   async send(options: SendMailOptions): Promise<void> {
     await this.transporter.sendMail({
-      from: this.config.get<string>('MAIL_FROM'),
+      from: this.config.get<string>('mail.from'),
       ...options,
     });
   }

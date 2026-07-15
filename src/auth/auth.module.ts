@@ -20,9 +20,9 @@ import { VerificationTokenModule } from 'src/verification_token/verification_tok
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        secret: config.getOrThrow<StringValue>('JWT_SECRET'),
+        secret: config.getOrThrow<StringValue>('jwt.secret'),
         signOptions: {
-          expiresIn: config.getOrThrow<StringValue>('JWT_EXPIRES_IN'),
+          expiresIn: config.getOrThrow<StringValue>('jwt.expiresIn'),
         },
       }),
     }),

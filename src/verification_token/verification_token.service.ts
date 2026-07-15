@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createHash, randomBytes } from 'crypto';
 import { User } from 'src/users/entities/user.entity';
@@ -15,6 +16,7 @@ export class VerificationTokenService {
     private readonly tokenRepository: Repository<VerificationToken>,
     private readonly mailService: MailService,
     private readonly usersService: UsersService,
+    private readonly configService: ConfigService,
   ) {}
 
   private hashToken(rawToken: string): string {
@@ -32,7 +34,8 @@ export class VerificationTokenService {
       expiresAt: addHours(new Date(), 24), // link expires in 24h
     });
 
-    const verifyUrl = `${process.env.APP_URL}/auth/verify-email?token=${rawToken}`;
+    const appUrl = this.configService.get<string>('mail.appUrl');
+    const verifyUrl = `${appUrl}/auth/verify-email?token=${rawToken}`;
 
     await this.mailService.send({
       to: user.email,
