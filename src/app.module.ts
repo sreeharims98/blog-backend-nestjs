@@ -14,6 +14,7 @@ import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 import mailConfig from './config/mail.config';
 import { validate } from './config/env.validation';
+import { PasswordResetTokensModule } from './password_reset_tokens/password_reset_tokens.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { validate } from './config/env.validation';
     BlogsModule,
     RefreshTokensModule,
     VerificationTokenModule,
+    PasswordResetTokensModule,
   ],
   controllers: [AppController],
   providers: [

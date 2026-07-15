@@ -10,12 +10,14 @@ import { PasswordService } from 'src/common/services/password.service';
 import { RefreshTokensModule } from 'src/refresh_tokens/refresh_tokens.module';
 import { TokenService } from 'src/common/services/token.service';
 import { VerificationTokenModule } from 'src/verification_token/verification_token.module';
+import { PasswordResetTokensModule } from 'src/password_reset_tokens/password_reset_tokens.module';
 
 @Module({
   imports: [
     UsersModule,
     RefreshTokensModule,
     VerificationTokenModule,
+    PasswordResetTokensModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

@@ -5,11 +5,12 @@ import { MailService } from 'src/common/services/email.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { VerificationToken } from './entities/verification_token.entity';
 import { UsersModule } from 'src/users/users.module';
+import { CryptoService } from 'src/common/services/crypto.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([VerificationToken]), UsersModule],
   controllers: [VerificationTokenController],
-  providers: [VerificationTokenService, MailService],
+  providers: [VerificationTokenService, MailService, CryptoService],
   exports: [VerificationTokenService],
 })
 export class VerificationTokenModule {}

@@ -13,12 +13,16 @@ import { RefreshTokenDto } from 'src/refresh_tokens/dto/refresh-token.dto';
 import { Auth } from 'src/common/decorators/auth.decorator';
 import { VerificationTokenService } from 'src/verification_token/verification_token.service';
 import { ResendVerificationTokenDto } from 'src/verification_token/dto/resend-verification_token.dto';
+import { PasswordResetTokensService } from 'src/password_reset_tokens/password_reset_tokens.service';
+import { ForgotPasswordDto } from 'src/password_reset_tokens/dto/forgot-password.dto';
+import { ResetPasswordDto } from 'src/password_reset_tokens/dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly verificationTokenService: VerificationTokenService,
+    private readonly passwordResetTokenService: PasswordResetTokensService,
   ) {}
 
   @Post('login')
@@ -60,5 +64,17 @@ export class AuthController {
   @Throttle({ default: { limit: 3, ttl: 300000 } })
   async resendVerification(@Body() dto: ResendVerificationTokenDto) {
     return await this.verificationTokenService.resendVerification(dto.email);
+  }
+
+  @Post('forgot-password')
+  @Throttle({ default: { limit: 3, ttl: 300000 } })
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return await this.passwordResetTokenService.forgotPassword(dto.email);
+  }
+
+  @Post('reset-password')
+  @Throttle({ default: { limit: 3, ttl: 300000 } })
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return await this.passwordResetTokenService.resetPassword(resetPasswordDto);
   }
 }

@@ -113,4 +113,10 @@ export class UsersService {
       emailVerifiedAt: new Date(),
     });
   }
+
+  async updatePassword(userId: number, hashedPassword: string) {
+    await this.usersRepository.update(userId, {
+      password: hashedPassword,
+    });
+  }
 }

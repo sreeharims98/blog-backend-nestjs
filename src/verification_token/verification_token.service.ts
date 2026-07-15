@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { createHash, randomBytes } from 'crypto';
 import { User } from 'src/users/entities/user.entity';
 import { VerificationToken } from './entities/verification_token.entity';
 import { Repository } from 'typeorm';
 import { MailService } from 'src/common/services/email.service';
 import { addHours } from 'date-fns';
 import { UsersService } from 'src/users/users.service';
+import { CryptoService } from 'src/common/services/crypto.service';
 
 @Injectable()
 export class VerificationTokenService {
@@ -17,16 +17,12 @@ export class VerificationTokenService {
     private readonly mailService: MailService,
     private readonly usersService: UsersService,
     private readonly configService: ConfigService,
+    private readonly cryptoService: CryptoService,
   ) {}
 
-  private hashToken(rawToken: string): string {
-    // Deterministic hash — needed for exact-match lookup, unlike bcrypt
-    return createHash('sha256').update(rawToken).digest('hex');
-  }
-
   async sendVerificationEmail(user: User) {
-    const rawToken = randomBytes(32).toString('hex');
-    const tokenHash = this.hashToken(rawToken);
+    const rawToken = this.cryptoService.generateRandomString();
+    const tokenHash = this.cryptoService.hashString(rawToken);
 
     await this.tokenRepository.save({
       user,
@@ -42,12 +38,12 @@ export class VerificationTokenService {
       subject: 'Verify your email address',
       html: `<p>Click the link below to verify your account:</p>
                  <a href="${verifyUrl}">${verifyUrl}</a>
-                 <p>This link expires in 24 hours.</p>`,
+                 <p>This link expires in 24 hour. If you didn't request this, ignore this email.</p>`,
     });
   }
 
   async verifyEmail(rawToken: string) {
-    const tokenHash = this.hashToken(rawToken);
+    const tokenHash = this.cryptoService.hashString(rawToken);
 
     const stored = await this.tokenRepository.findOne({
       where: { tokenHash },
