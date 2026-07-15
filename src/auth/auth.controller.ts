@@ -1,14 +1,25 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { Throttle } from '@nestjs/throttler';
 import { RefreshTokenDto } from 'src/refresh_tokens/dto/refresh-token.dto';
 import { Auth } from 'src/common/decorators/auth.decorator';
+import { VerificationTokenService } from 'src/verification_token/verification_token.service';
+import { ResendVerificationTokenDto } from 'src/verification_token/dto/resend-verification_token.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly verificationTokenService: VerificationTokenService,
+  ) {}
 
   @Post('login')
   @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 attempts per minute
@@ -33,5 +44,21 @@ export class AuthController {
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   logout(@Body() dto: RefreshTokenDto) {
     return this.authService.logout(dto);
+  }
+
+  @Post('verify-email')
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  async verifyEmail(@Query('token') token: string) {
+    if (!token) {
+      throw new BadRequestException('Verification token is required');
+    }
+    await this.verificationTokenService.verifyEmail(token);
+    return { message: 'Email verified successfully' };
+  }
+
+  @Post('resend-verification')
+  @Throttle({ default: { limit: 3, ttl: 300000 } })
+  async resendVerification(@Body() dto: ResendVerificationTokenDto) {
+    return await this.verificationTokenService.resendVerification(dto.email);
   }
 }

@@ -36,6 +36,7 @@ export class UsersService {
         name: true,
         email: true,
         password: true,
+        isEmailVerified: true,
       },
     });
   }
@@ -104,5 +105,12 @@ export class UsersService {
     return {
       message: 'User deactivated successfully',
     };
+  }
+
+  async markEmailVerified(userId: number) {
+    await this.usersRepository.update(userId, {
+      isEmailVerified: true,
+      emailVerifiedAt: new Date(),
+    });
   }
 }

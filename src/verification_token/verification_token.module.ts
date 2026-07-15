@@ -4,9 +4,10 @@ import { VerificationTokenController } from './verification_token.controller';
 import { MailService } from 'src/common/services/email.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { VerificationToken } from './entities/verification_token.entity';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([VerificationToken])],
+  imports: [TypeOrmModule.forFeature([VerificationToken]), UsersModule],
   controllers: [VerificationTokenController],
   providers: [VerificationTokenService, MailService],
   exports: [VerificationTokenService],
