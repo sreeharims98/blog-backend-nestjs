@@ -1,5 +1,6 @@
 import {
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -13,6 +14,7 @@ import { BlogResponseDto } from './dto/blog-response.dto';
 import { QueryBlogDto } from './dto/query-blog.dto';
 import { PaginatedResponseDto } from 'src/common/dto/paginated-response.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class BlogsService {
@@ -20,6 +22,7 @@ export class BlogsService {
     @InjectRepository(Blog)
     private readonly blogRepository: Repository<Blog>,
     private readonly slugService: SlugService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
   async findBlogById(id: number) {
@@ -60,6 +63,13 @@ export class BlogsService {
   }
 
   async findAll(query: QueryBlogDto) {
+    // Build a cache key unique to this exact combination of filters
+    const cacheKey = `blogs:${JSON.stringify(query)}`;
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const qb = this.blogRepository
       .createQueryBuilder('blog')
       .leftJoinAndSelect('blog.author', 'author')
@@ -94,7 +104,15 @@ export class BlogsService {
 
     const [blogs, total] = await qb.getManyAndCount();
 
-    return new PaginatedResponseDto(blogs, query.page, query.limit, total);
+    const result = new PaginatedResponseDto(
+      blogs,
+      query.page,
+      query.limit,
+      total,
+    );
+
+    await this.cacheManager.set(cacheKey, result, 30 * 1000);
+    return result;
   }
 
   async update(id: number, dto: UpdateBlogDto, user: User) {

@@ -67,6 +67,15 @@ class EnvironmentVariables {
 
   @IsUrl({ require_tld: false })
   APP_URL: string;
+
+  @IsString()
+  @IsNotEmpty()
+  REDIS_HOST: string;
+
+  @IsNumber()
+  @Min(0)
+  @Max(65535)
+  REDIS_PORT: number;
 }
 
 export function validate(config: Record<string, any>) {

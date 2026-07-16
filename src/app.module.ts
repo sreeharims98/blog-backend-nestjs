@@ -13,8 +13,11 @@ import { VerificationTokenModule } from './verification_token/verification_token
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 import mailConfig from './config/mail.config';
+import redisConfig from './config/redis.config';
 import { validate } from './config/env.validation';
 import { PasswordResetTokensModule } from './password_reset_tokens/password_reset_tokens.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { createKeyv } from '@keyv/redis';
 
 @Module({
   imports: [
@@ -27,7 +30,18 @@ import { PasswordResetTokensModule } from './password_reset_tokens/password_rese
     ConfigModule.forRoot({
       isGlobal: true,
       validate,
-      load: [databaseConfig, jwtConfig, mailConfig],
+      load: [databaseConfig, jwtConfig, mailConfig, redisConfig],
+    }),
+    CacheModule.registerAsync({
+      isGlobal: true, // makes CACHE_MANAGER injectable everywhere, no need to re-import per module
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        stores: [
+          createKeyv(
+            `redis://${config.get<string>('redis.host')}:${config.get<number>('redis.port')}`,
+          ),
+        ],
+      }),
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -49,6 +63,7 @@ import { PasswordResetTokensModule } from './password_reset_tokens/password_rese
         migrationsRun: true, // auto-run pending migrations on startup — optional
       }),
     }),
+
     AuthModule,
     UsersModule,
     BlogsModule,
