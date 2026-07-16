@@ -25,6 +25,16 @@ export class BlogsService {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
+  private async getCacheVersion(): Promise<number> {
+    const version = await this.cacheManager.get<number>('blogs:cache-version');
+    return version ?? 1;
+  }
+
+  private async bumpCacheVersion(): Promise<void> {
+    const current = await this.getCacheVersion();
+    await this.cacheManager.set('blogs:cache-version', current + 1, 0); // no expiry
+  }
+
   async findBlogById(id: number) {
     return await this.blogRepository.findOne({
       where: { id },
@@ -52,6 +62,7 @@ export class BlogsService {
     });
 
     await this.blogRepository.save(blog);
+    await this.bumpCacheVersion();
     return {
       id: blog.id,
       title: blog.title,
@@ -128,6 +139,7 @@ export class BlogsService {
     blog.content = dto.content ?? blog.content;
 
     await this.blogRepository.save(blog);
+    await this.bumpCacheVersion();
 
     return {
       id: blog.id,
@@ -149,6 +161,7 @@ export class BlogsService {
     }
 
     await this.blogRepository.softDelete(id);
+    await this.bumpCacheVersion();
     return { message: 'Blog deleted successfully' };
   }
 
@@ -160,6 +173,7 @@ export class BlogsService {
     }
 
     await this.blogRepository.softDelete(id);
+    await this.bumpCacheVersion();
     return { message: 'Blog deleted successfully' };
   }
 }
