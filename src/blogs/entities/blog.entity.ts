@@ -5,12 +5,14 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
   DeleteDateColumn,
   Index,
 } from 'typeorm';
 import { BlogStatus } from '../enum/blog.enum';
 import { User } from '../../users/entities/user.entity';
+import { Favorite } from '../../favorites/entities/favorite.entity';
 
 @Entity('blogs')
 // Compound Partial Index for status and createdAt
@@ -46,6 +48,9 @@ export class Blog {
     name: 'author_id',
   })
   author: User;
+
+  @OneToMany(() => Favorite, (favorite) => favorite.blog)
+  favorites: Favorite[];
 
   @CreateDateColumn()
   createdAt: Date;

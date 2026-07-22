@@ -16,6 +16,7 @@ import mailConfig from './config/mail.config';
 import redisConfig from './config/redis.config';
 import { validate } from './config/env.validation';
 import { PasswordResetTokensModule } from './password_reset_tokens/password_reset_tokens.module';
+import { FavoritesModule } from './favorites/favorites.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv } from '@keyv/redis';
 
@@ -70,6 +71,7 @@ import { createKeyv } from '@keyv/redis';
     RefreshTokensModule,
     VerificationTokenModule,
     PasswordResetTokensModule,
+    FavoritesModule,
   ],
   controllers: [AppController],
   providers: [

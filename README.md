@@ -1,6 +1,6 @@
 {
-"email": "sreehari@gmail.com",
-"password": "sreehari"
+"email": "iamsreeharims@gmail.com",
+"password": "sreeharims"
 }
 
 # migration

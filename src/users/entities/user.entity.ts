@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Role } from '../enums/role.enum';
 import { Blog } from '../../blogs/entities/blog.entity';
+import { Favorite } from '../../favorites/entities/favorite.entity';
 
 @Entity('users')
 export class User {
@@ -36,6 +37,9 @@ export class User {
 
   @OneToMany(() => Blog, (blog) => blog.author)
   blogs: Blog[];
+
+  @OneToMany(() => Favorite, (favorite) => favorite.user)
+  favorites: Favorite[];
 
   @CreateDateColumn()
   createdAt: Date;
